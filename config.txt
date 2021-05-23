@@ -1,0 +1,3 @@
+url := http://192.168.2.1/start_apply.htm
+headers := {"Authorization": "Basic YWRtaW46YWRtaW4="}
+params := {"current_page": "Advanced_WAN_Content.asp","action_mode": "Apply ","lan_ipaddr": "192.168.2.1","lan_netmask": "255.255.255.0","wan_pppoe_username": "user","wan_pppoe_passwd": "password","sid_list": "Layer3Forwarding;LANHostConfig;IPConnection;PPPConnection;WLANConfig11b"}
