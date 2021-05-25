@@ -1,4 +1,4 @@
-# 用于本地拦截NetKeeper账号并提交到路由器
+# 用于本地拦截NetKeeper账号并提交到路由器(理论上路由器通用)
 
 ## 需要安装 [winpacp](https://www.winpcap.org/install/bin/WinPcap_4_1_3.exe)
 
