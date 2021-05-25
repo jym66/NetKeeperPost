@@ -110,7 +110,7 @@ class PPPOE:
                 except AttributeError:
                     password = ""
                 print(f"请打开路由器拨号页面,将拨号用户名设置为{self.default_user},密码自行填写,然后拨号")
-                RouterPost1.HttpResend(self.host, self.default_user, user)
+                RouterPost1.HttpResend(self.host, self.default_user, user).start()
 
 
 if __name__ == '__main__':

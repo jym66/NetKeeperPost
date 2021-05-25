@@ -1,6 +1,9 @@
-from scapy.all import sr1,sniff
+import socket
+from scapy.all import sniff
 from scapy.layers.http import HTTPRequest, HTTP
-from scapy.layers.inet import TCP_client
+from scapy.sessions import TCPSession
+from scapy.supersocket import StreamSocket
+from time import sleep
 
 
 class HttpResend:
@@ -10,9 +13,14 @@ class HttpResend:
         self.filter = f"host {self.host} and tcp and port 80"
         self.default_user = default_user
         self.username = username
+        self.stopFlag = False
 
     def start(self):
-        sniff(filter=self.filter, prn=self.parse)
+        sniff(filter=self.filter, prn=self.parse, session=TCPSession, stop_filter=self.stop)
+        return
+
+    def stop(self, x):
+        return self.stopFlag
 
     def getUser(self):
         # 用户名加密的话可以在这里改
@@ -45,11 +53,17 @@ class HttpResend:
                 Authorization=pkt[HTTPRequest].fields.get('Authorization'),
             ) / body
             print("数据组装完毕,开始重新发送拨号请求")
-            client = TCP_client.tcplink(HTTP, self.host, self.port)
-            response = client.sr1(request, verbose=False)
-            print("发送完毕,状态码: " + response.getlayer("HTTPResponse").fields.get("Status_Code").decode() + " 请自行查看拨号是否成功")
-            client.close()
+            sleep(1)  # 等一秒发送, 要不然发送太快可能不生效
+            response = self.send_requests(request)
+            print("发送完毕 状态码: " + response.getlayer("HTTPResponse").fields.get("Status_Code").decode() + " 请自行查看拨号是否成功")
+            self.stopFlag = True
+
+    def send_requests(self, byte_data):
+        s = socket.socket()
+        s.connect((self.host, self.port))
+        sock = StreamSocket(s, HTTP)
+        return sock.sr1(byte_data, verbose=False)
 
 
 if __name__ == '__main__':
-    HttpResend("192.168.0.1", "root1", "password").start()
+    HttpResend("192.168.0.156", "123", "password").start()
