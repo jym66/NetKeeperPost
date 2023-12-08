@@ -4,7 +4,8 @@ from scapy.layers.http import HTTPRequest, HTTP
 from scapy.sessions import TCPSession
 from scapy.supersocket import StreamSocket
 from time import sleep
-
+from urllib.parse import quote
+#对用户名进行url编码，避免获取到真实的用户名掺杂特殊字符提交失败，特殊字符包括但不限于空格，方括号，星号，and符号等
 
 class HttpResend:
     def __init__(self, host, default_user, username):
@@ -29,7 +30,9 @@ class HttpResend:
     def parse(self, pkt):
         # 解析HTTP协议
         if pkt.haslayer(HTTPRequest) and str(pkt.getlayer("Raw")).find(self.getUser()) != -1:
-            body = bytes(pkt.getlayer("Raw")).decode().replace(self.default_user, self.username)
+            # URL编码用户名
+            encoded_username = quote(self.username)
+            body = bytes(pkt.getlayer("Raw")).decode().replace(self.default_user, encoded_username)
             print("已获取路由器发送的 HTTP 请求体,开始重新组装数据")
             if pkt[HTTPRequest].fields.get('Content_Length') is not None:
                 pkt[HTTPRequest].fields['Content_Length'] = str(len(body)).encode()
